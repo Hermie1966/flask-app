@@ -13,18 +13,27 @@ ACCESS_TOKEN = "bxV0JrVz5gY9yWZxsZaqAAdRwHuFI9O_o4Cxvt87p1w"  # Required for aut
 ACCOUNT_ID = "4193313"  # Specifies which trading account to use
 
 def get_account_balance():
-    """Fetch account balance from cTrader API."""
-    balance_url = f"{CTRADER_API_URL}/accounts/{ACCOUNT_ID}"
-    headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
+    balance_url = f"https://api.ctrader.com/v1/accounts/{ACCOUNT_ID}/balance"
+
+    headers = {
+        "Authorization": f"Bearer {ACCESS_TOKEN}",
+        "Content-Type": "application/json"
+    }
+
+    # Debugging: Print the API URL and headers to check for errors
+    print(f"Debug: Balance API URL: {balance_url}")
+    print(f"Debug: Headers: {headers}")
 
     response = requests.get(balance_url, headers=headers)
 
+    # Debugging: Print the response status code & content
+    print(f"Debug: Response Status Code: {response.status_code}")
+    print(f"Debug: Response Content: {response.text}")
+
     if response.status_code == 200:
-        account_info = response.json()
-        return account_info.get("balance", 0)  # Return balance, default to 0
+        return response.json().get("balance", 0)
     else:
-        print(f"Error fetching balance: {response.text}")
-        return 0  # Fallback if API call fails
+        raise Exception(f"Failed to fetch balance: {response.text}")
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
